@@ -1,0 +1,7 @@
+{
+  "name": "TRUBank HR AI Assistant",
+  "description": "An AI-powered, mobile-first HR ecosystem designed to automate processes and provide intelligent insights for TRUBank employees and administrators, featuring a Glassmorphism 2.0 UI.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
