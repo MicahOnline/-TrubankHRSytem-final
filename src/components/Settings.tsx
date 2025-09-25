@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
-import { SunIcon, MoonIcon, TrashIcon, ClipboardListIcon, BookOpenIcon } from '../../components/icons';
+import { SunIcon, MoonIcon, TrashIcon, ClipboardListIcon, BookOpenIcon, CodeIcon } from '../../components/icons';
 import * as api from '../utils/api';
 import { LeavePolicy, ExamConfig, ProctoringSensitivity } from '../../types';
 import { clearChatHistory } from '../../services/geminiService';
@@ -34,6 +34,84 @@ const SettingsToggle: React.FC<{ label: string; description: string; children: R
         </button>
     </div>
 );
+
+const BackendGuide: React.FC = () => (
+    <GlassCard>
+        <div className="space-y-4 text-gray-300 font-mono text-sm max-h-[70vh] overflow-y-auto pr-4 custom-scrollbar">
+            <h3 className="text-xl font-bold text-white font-sans">Backend Integration Guide</h3>
+            <p className="font-sans text-base">This document outlines the API contract for the TRUBank HR backend. The frontend is ready and expects a RESTful API with endpoints prefixed with `/api`.</p>
+            
+            <h4 className="text-lg font-semibold text-emerald-300 font-sans pt-2">Authentication</h4>
+            <pre className="bg-black/30 p-3 rounded-md whitespace-pre-wrap text-xs">
+                <code>
+                    **POST /api/auth/login**<br/>
+                    - Description: Authenticates a user.<br/>
+                    - Request Body: {`{ "emailOrPhone": "string", "password": "string" }`}<br/>
+                    - Response (200): User object<br/>
+                    - Response (401): {`{ "message": "Invalid credentials." }`}
+                </code>
+            </pre>
+
+            <h4 className="text-lg font-semibold text-emerald-300 font-sans pt-2">Users</h4>
+            <pre className="bg-black/30 p-3 rounded-md whitespace-pre-wrap text-xs">
+                <code>
+                    **GET /api/users** -&gt; User[]<br/>
+                    **GET /api/users/:id** -&gt; User<br/>
+                    **POST /api/users** (Body: UserData) -&gt; User (created)<br/>
+                    **PATCH /api/users/:id** (Body: Partial&lt;User&gt;) -&gt; User (updated)<br/>
+                    **POST /api/users/:id/avatar** -&gt; User (updated with new avatarUrl)<br/>
+                    **POST /api/users/:id/reset-password** -&gt; {`{ success: true }`}<br/>
+                    **POST /api/users/:id/change-password** (Body: {`{ current, new }`}) -&gt; {`{ success: true }`}
+                </code>
+            </pre>
+
+             <h4 className="text-lg font-semibold text-emerald-300 font-sans pt-2">Leave Management</h4>
+            <pre className="bg-black/30 p-3 rounded-md whitespace-pre-wrap text-xs">
+                <code>
+                    **GET /api/leave-requests** -&gt; LeaveRequest[]<br/>
+                    **POST /api/leave-requests** (Body: LeaveRequestData) -&gt; LeaveRequest (created)<br/>
+                    **PATCH /api/leave-requests/:id** (Body: Partial&lt;LeaveRequest&gt;) -&gt; LeaveRequest (updated)<br/>
+                    **PATCH /api/leave-requests/:id/status** (Body: {`{ status, remarks }`}) -&gt; LeaveRequest (updated)<br/>
+                    **DELETE /api/leave-requests/:id** -&gt; 204 No Content<br/>
+                    **GET /api/leave-ledger/:userId** -&gt; LeaveLedgerEntry[]<br/>
+                    **POST /api/leave-ledger** (Body: LedgerEntryData) -&gt; LeaveLedgerEntry (created)<br/>
+                    **GET /api/leave-policy** -&gt; LeavePolicy<br/>
+                    **PUT /api/leave-policy** (Body: LeavePolicy) -&gt; LeavePolicy (updated)<br/>
+                </code>
+            </pre>
+
+            <h4 className="text-lg font-semibold text-emerald-300 font-sans pt-2">Exams & Announcements</h4>
+            <pre className="bg-black/30 p-3 rounded-md whitespace-pre-wrap text-xs">
+                <code>
+                    **GET /api/exams** -&gt; Exam[]<br/>
+                    **GET /api/exams/:id** -&gt; Exam<br/>
+                    **POST /api/exams** (Body: ExamData) -&gt; Exam (created)<br/>
+                    **DELETE /api/exams/:id** -&gt; 204 No Content<br/>
+                    **POST /api/exams/:id/submit** (Body: {`{ userId, answers }`}) -&gt; ExamResult<br/>
+                    **GET /api/exam-config** -&gt; ExamConfig<br/>
+                    **PUT /api/exam-config** (Body: ExamConfig) -&gt; ExamConfig (updated)<br/>
+                    **GET /api/announcements?includeScheduled=true** -&gt; Announcement[]<br/>
+                    **POST /api/announcements** (Body: AnnouncementData) -&gt; Announcement (created)<br/>
+                </code>
+            </pre>
+            
+            <h4 className="text-lg font-semibold text-emerald-300 font-sans pt-2">Database Schema Recommendations</h4>
+             <pre className="bg-black/30 p-3 rounded-md whitespace-pre-wrap text-xs">
+                <code>
+                    - **users**: id, name, email, phone, password_hash, role, status, last_login, avatar_url, department, notifications (JSON)<br/>
+                    - **leave_requests**: id, user_id, leave_type, start_date, end_date, reason, status, remarks<br/>
+                    - **leave_ledger**: id, user_id, date, transaction_type, days, notes, vacation_balance, sick_balance<br/>
+                    - **exams**: id, title, topic, assigned_to (JSON), scheduled_date, due_date, start_time, duration<br/>
+                    - **questions**: id, exam_id, text, options (JSON), correct_answer_index<br/>
+                    - **exam_results**: id, user_id, exam_id, score, status, completed_date<br/>
+                    - **(Single Row Tables/JSON store)**: leave_policy, exam_config
+                </code>
+            </pre>
+        </div>
+        <style>{`.custom-scrollbar::-webkit-scrollbar { width: 6px; } .custom-scrollbar::-webkit-scrollbar-track { background: transparent; } .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, 0.2); border-radius: 20px; }`}</style>
+    </GlassCard>
+);
+
 
 const Settings: React.FC<SettingsProps> = ({ addToast }) => {
     const { theme, toggleTheme } = useTheme();
@@ -133,6 +211,7 @@ const Settings: React.FC<SettingsProps> = ({ addToast }) => {
                         <>
                             <button onClick={() => setActiveTab('Leave Policies')} role="tab" aria-selected={activeTab === 'Leave Policies'} className={`px-4 py-3 text-sm font-medium transition-colors duration-200 border-b-2 ${activeTab === 'Leave Policies' ? 'border-emerald-400 text-gray-900 dark:text-white' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white'}`}>Leave Policies</button>
                             <button onClick={() => setActiveTab('Exam Config')} role="tab" aria-selected={activeTab === 'Exam Config'} className={`px-4 py-3 text-sm font-medium transition-colors duration-200 border-b-2 ${activeTab === 'Exam Config' ? 'border-emerald-400 text-gray-900 dark:text-white' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white'}`}>Exam Config</button>
+                            <button onClick={() => setActiveTab('Backend Guide')} role="tab" aria-selected={activeTab === 'Backend Guide'} className={`px-4 py-3 text-sm font-medium transition-colors duration-200 border-b-2 ${activeTab === 'Backend Guide' ? 'border-emerald-400 text-gray-900 dark:text-white' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white'}`}><CodeIcon className="w-5 h-5 inline-block mr-2"/>Backend Guide</button>
                         </>
                     )}
                 </div>
@@ -164,7 +243,6 @@ const Settings: React.FC<SettingsProps> = ({ addToast }) => {
             )}
 
             {isAdmin && activeTab === 'Leave Policies' && (
-                // FIX: The GlassCard component does not accept a 'role' prop. The role="tabpanel" should be on a wrapper div for accessibility.
                 <div role="tabpanel">
                     <GlassCard>
                         <div className="flex items-center gap-3 mb-4">
@@ -221,7 +299,6 @@ const Settings: React.FC<SettingsProps> = ({ addToast }) => {
             )}
 
             {isAdmin && activeTab === 'Exam Config' && (
-                // FIX: The GlassCard component does not accept a 'role' prop. The role="tabpanel" should be on a wrapper div for accessibility.
                 <div role="tabpanel">
                     <GlassCard>
                         <div className="flex items-center gap-3 mb-4">
@@ -272,7 +349,12 @@ const Settings: React.FC<SettingsProps> = ({ addToast }) => {
                     </GlassCard>
                 </div>
             )}
-
+            
+            {isAdmin && activeTab === 'Backend Guide' && (
+                 <div role="tabpanel">
+                    <BackendGuide />
+                 </div>
+            )}
         </div>
     );
 };

@@ -378,3 +378,9 @@ export const MicrosoftIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) =>
         <path d="M21.5 12.5H12.5V3.5H21.5V12.5Z" fill="#FFB900"/>
     </svg>
 );
+
+export const CodeIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+  </svg>
+);
