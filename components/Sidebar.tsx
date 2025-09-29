@@ -19,20 +19,20 @@ const NavItem: React.FC<{
   onClick: () => void;
   isCollapsed: boolean;
 }> = ({ icon, label, isActive, onClick, isCollapsed }) => (
-  <div title={isCollapsed ? label : undefined}>
-    <button
-      onClick={onClick}
-      aria-current={isActive ? 'page' : undefined}
-      className={`flex items-center w-full px-4 py-3 rounded-lg transition-all duration-200 ease-in-out transform ${
-        isActive
-          ? 'bg-emerald-100 dark:bg-white/20 text-emerald-600 dark:text-white shadow-lg'
-          : 'text-gray-600 dark:text-gray-400 hover:bg-gray-300/40 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white'
-      } ${isCollapsed ? 'justify-center hover:scale-110' : 'hover:translate-x-1'}`}
-    >
-      {icon}
-      {!isCollapsed && <span className="ml-4 font-medium whitespace-nowrap">{label}</span>}
-    </button>
-  </div>
+  <button
+    onClick={onClick}
+    aria-current={isActive ? 'page' : undefined}
+    aria-label={isCollapsed ? label : undefined}
+    title={isCollapsed ? label : undefined}
+    className={`flex items-center w-full px-4 py-3 rounded-lg transition-all duration-200 ease-in-out transform ${
+      isActive
+        ? 'bg-emerald-100 dark:bg-white/20 text-emerald-600 dark:text-white shadow-lg'
+        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-300/40 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white'
+    } ${isCollapsed ? 'justify-center hover:scale-110' : 'hover:translate-x-1'}`}
+  >
+    {icon}
+    {!isCollapsed && <span className="ml-4 font-medium whitespace-nowrap">{label}</span>}
+  </button>
 );
 
 const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView, isOpen, setIsOpen }) => {

@@ -36,7 +36,8 @@ const ExamTaking: React.FC<ExamTakingProps> = ({ examId, userId, onFinish, addTo
     // AI Proctoring State
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const proctoringIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    // FIX: Changed NodeJS.Timeout to number for browser compatibility.
+    const proctoringIntervalRef = useRef<number | null>(null);
     const [isCameraReady, setIsCameraReady] = useState(false);
     const [cameraError, setCameraError] = useState<string | null>(null);
     const [aiProctoringStatus, setAiProctoringStatus] = useState('Initializing...');
@@ -312,7 +313,7 @@ const ExamTaking: React.FC<ExamTakingProps> = ({ examId, userId, onFinish, addTo
 
     const handlePrevious = () => {
         if (currentQuestionIndex > 0) {
-            setCurrentQuestionIndex(prev => prev - 1);
+            setCurrentQuestionIndex(prev => prev + 1);
         }
     };
 

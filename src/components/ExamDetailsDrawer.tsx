@@ -123,9 +123,29 @@ const ExamDetailsDrawer: React.FC<ExamDetailsDrawerProps> = ({ exam, isOpen, onC
                                                     <p className="text-xs text-gray-400">{user.email}</p>
                                                 </div>
                                             </div>
-                                            <div className="flex items-center gap-2">
-                                                {progress && status !== 'Pending' && <span className="text-sm font-semibold">{progress.score}%</span>}
-                                                <div title={status}>{getStatusIcon(status)}</div>
+                                             <div className="flex items-center gap-2 w-1/3">
+                                                {status === 'Pending' ? (
+                                                    (() => {
+                                                        const totalQuestions = exam.questions.length;
+                                                        const answered = progress?.answeredQuestions || 0;
+                                                        const progressPercent = totalQuestions > 0 ? Math.round((answered / totalQuestions) * 100) : 0;
+                                                        return (
+                                                            <>
+                                                                <div className="w-full bg-gray-700 rounded-full h-2" title={`${answered} / ${totalQuestions} answered`}>
+                                                                    <div className="bg-emerald-400 h-2 rounded-full" style={{ width: `${progressPercent}%` }}></div>
+                                                                </div>
+                                                                <span className="text-xs font-mono text-gray-300 w-10 text-right">{progressPercent}%</span>
+                                                            </>
+                                                        );
+                                                    })()
+                                                ) : (
+                                                    <>
+                                                        <div className="flex-grow text-right">
+                                                            {progress && <span className="text-sm font-semibold">{progress.score}%</span>}
+                                                        </div>
+                                                        <div title={status} className="w-5">{getStatusIcon(status)}</div>
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
                                     );

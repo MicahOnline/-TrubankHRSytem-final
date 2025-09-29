@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import * as api from '../utils/api';
-import { LeaveRequest, Exam, User, ExamResult } from '../../types';
+// FIX: Imported ExamStatus to resolve type errors.
+import { LeaveRequest, Exam, User, ExamResult, ExamStatus } from '../../types';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
 import { useTheme } from '../contexts/ThemeContext';
 import { DownloadIcon, CalendarIcon, BookOpenIcon, CheckCircleIcon, AlertTriangleIcon, PrintIcon } from '../../components/icons';
@@ -160,7 +161,8 @@ const Reports: React.FC = () => {
             let examTotalScore = 0;
             let examCompletedCount = 0;
             if (exam.userProgress) {
-                Object.values(exam.userProgress).forEach(p => {
+                // FIX: Explicitly typed 'p' to resolve TypeScript errors on 'p.status' and 'p.score'.
+                Object.values(exam.userProgress).forEach((p: { status: ExamStatus; score: number }) => {
                     if (p.status !== 'Pending') {
                         examTotalScore += p.score;
                         examCompletedCount++;

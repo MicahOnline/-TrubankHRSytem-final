@@ -107,6 +107,7 @@ export interface Exam {
             status: ExamStatus;
             score: number;
             completedDate: string;
+            answeredQuestions?: number;
         }
     }
 }
