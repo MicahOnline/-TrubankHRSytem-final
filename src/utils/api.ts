@@ -2,15 +2,29 @@ import { User, LeaveRequest, Exam, LeaveStatus, Announcement, Reminder, Notifica
 
 // Helper for making API calls to the backend
 async function apiFetch(endpoint: string, options: RequestInit = {}): Promise<any> {
+  const token = sessionStorage.getItem('jwt');
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    ...options.headers,
+  };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  
   const response = await fetch(`/api${endpoint}`, {
     ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
+    headers,
   });
 
   if (!response.ok) {
+     // Special handling for 401 Unauthorized, which indicates an invalid/expired token.
+    if (response.status === 401 && endpoint !== '/auth/login') {
+      sessionStorage.removeItem('jwt');
+      // Redirecting to login is a robust way to handle session expiry.
+      window.location.href = '/'; 
+      throw new Error('Session expired. Please log in again.');
+    }
     const errorData = await response.json().catch(() => ({ message: 'An unknown server error occurred.' }));
     throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
   }
@@ -28,7 +42,7 @@ async function apiFetch(endpoint: string, options: RequestInit = {}): Promise<an
 export const getUsers = (): Promise<User[]> => apiFetch('/users');
 export const getUser = (id: number): Promise<User> => apiFetch(`/users/${id}`);
 
-export const authenticateUser = (emailOrPhone: string, password: string): Promise<User> => 
+export const authenticateUser = (emailOrPhone: string, password: string): Promise<{user: User, token: string}> => 
     apiFetch('/auth/login', {
         method: 'POST',
         body: JSON.stringify({ emailOrPhone, password }),

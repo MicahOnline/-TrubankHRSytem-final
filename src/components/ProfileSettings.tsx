@@ -51,7 +51,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ addToast }) => {
         setIsUploading(true);
         try {
             await api.updateUserProfilePicture(user.id);
-            // FIX: Corrected the login call to pass the user ID as a string to refresh the user state.
             await login(String(user.id)); // Refresh user state globally
             addToast('Profile picture updated!', 'success');
         } catch (error) {
@@ -65,7 +64,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ addToast }) => {
         e.preventDefault();
         if (!user) return;
         
-        // Client-side validation
         if (!profileData.name.trim()) {
             addToast('Name cannot be empty.', 'error');
             return;
@@ -74,7 +72,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ addToast }) => {
         setIsSavingProfile(true);
         try {
             await api.updateUser(user.id, profileData);
-            // FIX: Corrected the login call to pass the user ID as a string to refresh the user state.
             await login(String(user.id)); // Refresh global user state
             addToast('Profile updated successfully!', 'success');
         } catch (error) {
@@ -114,7 +111,6 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ addToast }) => {
         setIsSavingNotifications(true);
         try {
             await api.updateUser(user.id, { notifications: notificationPrefs });
-            // FIX: Corrected the login call to pass the user ID as a string to refresh the user state.
             await login(String(user.id)); // Refresh global user state
             addToast('Notification settings saved!', 'success');
         } catch (error) {
@@ -151,7 +147,7 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ addToast }) => {
                                     onClick={handlePictureChange}
                                     disabled={isUploading}
                                     aria-label="Change profile picture"
-                                    className="absolute inset-0 bg-black/30 rounded-full flex items-center justify-center text-white opacity-70 hover:opacity-100 transition-opacity"
+                                    className="absolute inset-0 bg-black/30 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-70 hover:opacity-100 transition-opacity"
                                 >
                                     {isUploading 
                                         ? <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
